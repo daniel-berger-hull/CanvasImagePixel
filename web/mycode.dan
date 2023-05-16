@@ -1,0 +1,101 @@
+const buildRgb = (imageData) => {
+        const rgbValues = [];
+
+        const total = imageData.data.length;
+
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            const rgb = {
+            r: imageData.data[i],
+            g: imageData.data[i + 1],
+            b: imageData.data[i + 2],
+            };
+            rgbValues.push(rgb);
+        }
+        return rgbValues;
+};
+
+const buildRgbCode = (imageData) => {
+    const rgbValues = [];
+
+    const total = imageData.data.length;
+
+    for (let i = 0; i < imageData.data.length; i += 4) {
+
+        const value = (imageData.data[i] << 16) + (imageData.data[i + 1] << 8) + imageData.data[i + 2];
+        rgbValues.push(value);
+    }
+    return rgbValues;
+};
+
+
+
+const analyseColors = (rgbArray) => {
+
+
+    const colorCodeMap = new Map();
+    console.log(`Total Pixels ${rgbArray.length}`);
+
+
+
+    rgbArray.forEach(element => {
+        
+        const count = colorCodeMap.get(element);
+        if (count === undefined) {
+            colorCodeMap.set(element,0);
+        } else {
+            const newTotal = count+1;
+            colorCodeMap.set(element,newTotal);
+        }
+    });
+
+    const iterator1 = colorCodeMap.entries();
+    for (const nextColor of iterator1) {
+
+        if (nextColor[1] > 100)
+             console.log( nextColor[0] + "  ["  + codeToHex(nextColor[0]) + "] --> " + nextColor[1] );
+      }
+
+}
+
+const codeToHex = (colorCode) => {
+
+    const red  =  (colorCode & 16711680) >> 16;;
+    const green = (colorCode & 65280) >> 8;
+    const blue  = colorCode & 255;
+
+
+    //return `#${red}${green}${blue}`;
+    return `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`;
+    
+}
+
+    // const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
+    //     const hex = x.toString(16)
+    //     return hex.length === 1 ? '0' + hex : hex
+    // }).join('')
+
+  
+    // const processImage = () => {
+    //     console.log("Image loaded2!");
+
+    //     const img = document.querySelector("img");
+    //     const ctx = img.getContext("2d");
+
+
+    // }
+
+    
+const canvas = document.getElementById("my-canvas");
+const context = canvas.getContext("2d");
+const img = new Image()
+img.src = "./usa.png"
+img.onload = () => {
+    context.drawImage(img, 0, 0)
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+    const rgbData = buildRgbCode(imageData);
+
+    analyseColors(rgbData);
+
+   
+}
