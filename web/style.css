@@ -1,5 +1,5 @@
 body {
-    background-color: #2A6EB9;
+    background-color: #2A6EB9;    
 }
 
 h1 {
@@ -9,9 +9,9 @@ h1 {
 }
 
 .wrapper {
-    width: 90%;
+    width: 800px;
     margin: auto;
-    background-color: white;
+    background-color: rgb(202, 196, 196);
 }
 
 #map-image-section {
@@ -21,4 +21,10 @@ h1 {
     border: #2A6EB9;
     border-width : 2px;
     border-style: solid;
+}
+
+#buttons-section {
+    display: flex;
+    justify-content: center;
+    column-gap: 10px;
 }
