@@ -7,6 +7,8 @@ const GREEN = 65280;
 const BLUE   = 16711680;
 
 
+
+
 const buildRgb = (imageData) => {
         const rgbValues = [];
 
@@ -96,16 +98,21 @@ const analyseColors = (rgbArray) => {
 
 }
 
+
+
 const codeToHex = (colorCode) => {
 
     const red  =  (colorCode & 16711680) >> 16;;
     const green = (colorCode & 65280) >> 8;
     const blue  = colorCode & 255;
 
+    // return `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`; 
+    return rgbToHex(red,green,blue);
+}
 
-    //return `#${red}${green}${blue}`;
-    return `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`;
-    
+const rgbToHex = (red,green,blue) => {
+
+    return `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`; 
 }
 
 const indexToXY = (index, canvasWidth, canvasHeight) => {
@@ -170,7 +177,6 @@ const alterimage = (imageData) => {
                     } else
                         countWhite++;
 
-    
                     const maskingColor  = codeToRGB(lastMajorColor);
                     imageData.data[i]   = maskingColor.red;
                     imageData.data[i+1] = maskingColor.green;
@@ -184,8 +190,6 @@ const alterimage = (imageData) => {
     }
 
     console.log("Final Count is White = " + countWhite + " Red/Blue = " + countRedOrBlue);
-
-    
 }
 
 
@@ -283,8 +287,6 @@ img.onload = () => {
     console.log("getImageData");
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-   
-
     context.drawImage(img, 0, 0);
 }
 
@@ -295,6 +297,8 @@ img.onload = () => {
 const recolorButton = document.getElementById('recolorbutton');
 const findcontourButton = document.getElementById('findcontourbutton');
 
+const colorSampleView = document.getElementById('color-sample-view');
+
 
 canvas.addEventListener("click", func = (e) =>{
 
@@ -303,11 +307,32 @@ canvas.addEventListener("click", func = (e) =>{
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
 
-    const index = XYtoIndex( e.clientX ,e.clientY - canvas.offsetTop, canvas.width, canvas.height);
+    const xClick = e.clientX - canvas.offsetLeft;
+    const yClick = e.clientY - canvas.offsetTop;
+    
 
-    console.log("Clicked!  [" + e.clientX + "," + (e.clientY - canvas.offsetTop) + "] --> " + index);
+    const index = XYtoIndex( xClick ,yClick, canvas.width, canvas.height);
+    const hexColor = rgbToHex(imageData.data[index],imageData.data[index+1],imageData.data[index+2]);
+
+
+
+    imageData.data[index]   = 0;
+    imageData.data[index+1] = 0;
+    imageData.data[index+2] = 0;
+
+    //const value = (imageData.data[index] << 16) + (imageData.data[index + 1] << 8) + imageData.data[index + 2];
+
+    console.log("Clicked!  [" + yClick + "," + yClick + "] --> " + index + " and color is " + hexColor);
+
+  
+//    document.getElementById("color-sample-view").style.backgroundColor = "lightblue"; 
+    document.getElementById("color-sample-view").style.backgroundColor = hexColor;
 
     
+
+    context.putImageData(imageData, 0, 0);
+
+    //colorSampleView
 
     // imageData.data[i]   = maskingColor.red;
     // imageData.data[i+1] = maskingColor.green;
@@ -350,7 +375,7 @@ findcontourButton.addEventListener('click', () => {
  //     console.log(`${i} - [${imageData.data[i]},${imageData.data[i+1]},${imageData.data[i+2]},${imageData.data[0]}]`)
  //     }
  
-    context.putImageData(imageData, 0, 0)
+    context.putImageData(imageData, 0, 0);
  })
 
 

@@ -14,13 +14,22 @@ h1 {
     background-color: rgb(202, 196, 196);
 }
 
-#map-image-section {
+ #map-image-section {
   
+    display: flex;
+    align-items: center;
     margin: auto;
     text-align: center;
     border: #2A6EB9;
     border-width : 2px;
     border-style: solid;
+} 
+
+#color-sample-view {
+    margin: 10px;
+    width: 100px;
+    height: 100px;
+    background-color: green;
 }
 
 #buttons-section {
