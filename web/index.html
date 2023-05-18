@@ -21,7 +21,7 @@
         </div>
 
         <div id="buttons-section">
-             <button id="recolorbutton" >Recolor</button>
+             <button id="colorChangebutton" >Recolor</button>
              <button id="findcontourbutton" >Contour</button>
         </div>
 
@@ -29,16 +29,17 @@
     </div>
 
 
-    <!-- <script type="module">
+    <script type="module">
 
-        import { init,render } from './index.js';
+        import { registerHandlers } from './events.js';
     
     
-    </script> -->
+        registerHandlers();
+    </script>
 
 
     <!-- <script src="conversion.js"></script> -->
-    <script src="mycode.js"></script>
+    <!-- <script src="mycode.js"></script> -->
 
     
 </body>
