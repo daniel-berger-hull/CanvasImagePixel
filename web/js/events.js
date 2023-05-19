@@ -15,15 +15,9 @@ const canvasClickHanlder = (e) => {
     const yClick = e.clientY - canvas.offsetTop;
     const hexColor = getPixelColor(canvas,imageData.data,xClick,yClick);
     
-
-    // const color = {  red: 0, green: 0, blue: 0};
-    // setPixelColor(canvas,imageData.data,xClick,yClick,color);
-
     stretchBox(canvas,imageData,xClick,yClick);
 
-
-
-    console.log("Clicked!  [" + yClick + "," + yClick + "] --> and color is " + hexColor);
+    // console.log("Clicked!  [" + yClick + "," + yClick + "] --> and color is " + hexColor);
     document.getElementById("color-sample-view").style.backgroundColor = hexColor;
 
     context.putImageData(imageData, 0, 0);

@@ -5,6 +5,15 @@
 
 ***************************************************************************************************************************
 
+May 18
+======
+  Tryied to create a class to delegate the processing of the Inflate box (ColorBox.js), using HTML/JS Web worker.
+  But it appears that the update on the rendering is not done anymore (needs a call to a context.putImageData(...)),
+  and the context is lost or something of that sort...
+
+  Will go back, and try to use the  main thread to process the inflate box, very bad design, but just to see if it works, so I can later try again with the Web Worker thread...
+
+
 May 17
 ======
    Simple page created, and an image of the US election of 2016 is loaded and displayed.

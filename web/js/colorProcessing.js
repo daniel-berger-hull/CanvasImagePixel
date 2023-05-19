@@ -6,63 +6,15 @@ const RED   = 255;
 const GREEN = 65280;
 const BLUE   = 16711680;
 
+ import { codeToRGB,rgbToHex,
+          XYtoIndex,
+          isDark } from './conversion.js';
 
 
-
-const buildRgb = (imageData) => {
-        const rgbValues = [];
-
-        const total = imageData.data.length;
-
-        for (let i = 0; i < imageData.data.length; i += 4) {
-            const rgb = {
-            r: imageData.data[i],
-            g: imageData.data[i + 1],
-            b: imageData.data[i + 2],
-            };
-            rgbValues.push(rgb);
-        }
-        return rgbValues;
-};
-
-const buildRgbCode = (imageData) => {
-    const rgbValues = [];
-
-    const total = imageData.data.length;
-
-    for (let i = 0; i < imageData.data.length; i += 4) {
-        
-        const value = (imageData.data[i] << 16) + (imageData.data[i + 1] << 8) + imageData.data[i + 2];
-        rgbValues.push(value);
-    }
-    return rgbValues;
-};
-
-const codeToRGB = (code) => {
-
-
-    // const red1 =  code >> 16;
-    // const green1 = code >> 8;
-    // const green1 = code >> 8;
-    
-    return { red:   (code >> 16) & 255,
-             green: (code >> 8) & 255,
-             blue:  code & 255
-            };
-
-}
-
-const isDark = (rgb) => {
-    if (rgb.red > 20)    return false;
-    if (rgb.green > 20)  return false;
-    if (rgb.blue > 20)   return false;
-
-    return true;
-}
 
 // This method will do a total of all the occurence of a specific color code in the image...
 
-const analyseColors = (rgbArray) => {
+export const analyseColors = (rgbArray) => {
 
 
     const colorCodeMap = new Map();
@@ -99,32 +51,10 @@ const analyseColors = (rgbArray) => {
 }
 
 
+// This function is only a demo to show how to access and modify the color of an image date (context.getImageData)
+export const alterimage = (imageData) => {
 
-const codeToHex = (colorCode) => {
-
-    const red  =  (colorCode & 16711680) >> 16;;
-    const green = (colorCode & 65280) >> 8;
-    const blue  = colorCode & 255;
-
-    // return `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`; 
-    return rgbToHex(red,green,blue);
-}
-
-const rgbToHex = (red,green,blue) => {
-
-    return `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`; 
-}
-
-const indexToXY = (index, canvasWidth, canvasHeight) => {
-
-}
-
-
-const XYtoIndex = (x,y, canvasWidth, canvasHeight) => {
-    return ((canvasWidth * y) + x) * 4;
-}
-
-const alterimage = (imageData) => {
+    console.log("imageData.data.length is " + imageData.data.length);
 
     const rgbValues = [];
 
@@ -185,8 +115,6 @@ const alterimage = (imageData) => {
                 }
 
         }
-     
-        
     }
 
     console.log("Final Count is White = " + countWhite + " Red/Blue = " + countRedOrBlue);
@@ -194,9 +122,9 @@ const alterimage = (imageData) => {
 
 
 
-const findContour = (imageData) => {
+export const findContour = (imageData) => {
 
-    console.log("AlterImages 2");
+    console.log("Find contour imageData.data.length is " + imageData.data.length);
     const rgbValues = [];
 
     const total = imageData.data.length;
@@ -209,10 +137,6 @@ const findContour = (imageData) => {
     const canvasWidth  = imageData.width;
     const canvasHeight = imageData.height;
     
-    // const indexToXY = (index, canvasWidth, canvasHeight) => {
-
-    // }
-    
 
     for (let i = 0; i < imageData.data.length; i += 4) {
         
@@ -269,117 +193,117 @@ const findContour = (imageData) => {
     }
 
     console.log("Final Count is White = " + countWhite + " Red/Blue = " + countRedOrBlue);
-
-    
 }
 
 
 
-    
-const canvas = document.getElementById("my-canvas");
-const context = canvas.getContext("2d");
-const img = new Image()
- img.src = "./usa2.png";
-//img.src = "./test.png";
 
-img.onload = () => {
-    
-    console.log("getImageData");
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+export const setPixelColor = (canvas,dataBuffer,x,y,rgb) => {
 
-    context.drawImage(img, 0, 0);
+    const index = XYtoIndex( x ,y, canvas.width, canvas.height);
+
+    dataBuffer[index]   = rgb.red;
+    dataBuffer[index+1] = rgb.green
+    dataBuffer[index+2] = rgb.blue;
+
+    console.log("Clicked!  [" + x + "," + y + "] --> " + index );
+}  
+
+export const getPixelCode = (canvas,dataBuffer,x,y) => {
+
+    const index = XYtoIndex( x ,y, canvas.width, canvas.height);
+
+    let red = dataBuffer[index];
+    let green = dataBuffer[index+1];
+    let blue = dataBuffer[index+2];
+
+    red   = red << 16;
+    green = green << 8;
+   
+    
+
+    const value = (dataBuffer[index] << 16) + (dataBuffer[index + 1] << 8) + dataBuffer[index + 2];
+
+    return value;
 }
 
+export const getPixelColor = (canvas,dataBuffer,x,y) => {
+
+    const index = XYtoIndex( x ,y, canvas.width, canvas.height);
+
+    return rgbToHex(dataBuffer[index],dataBuffer[index+1],dataBuffer[index+2]);
+}  
+
+export const stretchBox = (canvas,imageData,x,y) => {
 
 
-// alterimage
-
-const recolorButton = document.getElementById('recolorbutton');
-const findcontourButton = document.getElementById('findcontourbutton');
-
-const colorSampleView = document.getElementById('color-sample-view');
+    const color = {  red: 255, green: 255, blue: 255};
 
 
-canvas.addEventListener("click", func = (e) =>{
-
-
-
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-
-    const xClick = e.clientX - canvas.offsetLeft;
-    const yClick = e.clientY - canvas.offsetTop;
     
 
-    const index = XYtoIndex( xClick ,yClick, canvas.width, canvas.height);
-    const hexColor = rgbToHex(imageData.data[index],imageData.data[index+1],imageData.data[index+2]);
 
-
-
-    imageData.data[index]   = 0;
-    imageData.data[index+1] = 0;
-    imageData.data[index+2] = 0;
-
-    //const value = (imageData.data[index] << 16) + (imageData.data[index + 1] << 8) + imageData.data[index + 2];
-
-    console.log("Clicked!  [" + yClick + "," + yClick + "] --> " + index + " and color is " + hexColor);
+    setPixelColor(canvas,imageData.data,x,y,color);
 
   
-//    document.getElementById("color-sample-view").style.backgroundColor = "lightblue"; 
-    document.getElementById("color-sample-view").style.backgroundColor = hexColor;
-
-    
-
-    context.putImageData(imageData, 0, 0);
-
-    //colorSampleView
-
-    // imageData.data[i]   = maskingColor.red;
-    // imageData.data[i+1] = maskingColor.green;
-    // imageData.data[i+2] = maskingColor.blue;
-    // printf( "click: screen(%.1f|%.1f) client(%.1f|%.1f) click count = %d",
-    //         e.screenX, e.screenY,
-    //         ,
-    //         e.click_count );
-  });
+    //let colorBox = new ColorBox(canvas,imageData,x,y);
 
 
+    //colorBox.process();
+//    console.log("[x,y] -> " + x + "," + y + " is " + code);
+    // console.log("Stretch Box!");
 
-
-
-recolorButton.addEventListener('click', () => {
-
-   const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-
-    alterimage(imageData);
-    console.log("imageData.data.length is " + imageData.data.length);
-
-   context.putImageData(imageData, 0, 0)
-})
-
-
-findcontourButton.addEventListener('click', () => {
-
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
- 
-     // const rgbData = buildRgbCode(imageData);
-     // analyseColors(rgbData);
- 
-     findContour(imageData);
- 
-     console.log("imageData.data.length is " + imageData.data.length);
- 
- 
- //    for (let i = 300000; i < 300000+100; i += 4) {
- //     console.log(`${i} - [${imageData.data[i]},${imageData.data[i+1]},${imageData.data[i+2]},${imageData.data[0]}]`)
- //     }
- 
-    context.putImageData(imageData, 0, 0);
- })
-
-
-
-const testColorChange = () => {
-    console.log("testColorChange");''
 }
+
+
+class ColorBox {
+
+    #canvas;
+    #imageData;
+    #xCenter;
+    #yCenter;
+    #worker;
+    
+    constructor(canvas,imageData,xCenter,yCenter){
+
+        this.#canvas = canvas;
+        this.#imageData = imageData;
+        this.#xCenter = xCenter;
+        this.#yCenter = yCenter;
+
+        this.#worker = new Worker('./js/worker.js');
+        this.#worker.addEventListener('message', function(e) {
+            console.log("Worker returned a message: " + e.data);
+
+            const context = this.#canvas.getContext("2d");
+
+            context.putImageData(imageData, 0, 0);
+        });
+    }
+
+
+    // Use a web worker to search in the imageData
+    process()  {
+        console.log("Will process a search for a color box...");
+
+        // const params = { canvas:  this.#canvas,
+        //                  imageData: this.#imageData ,
+        //                  xCenter:  this.#xCenter,
+        //                  yCenter: this.#yCenter };
+
+
+        const params = {   
+                         imageData: this.#imageData ,
+                         xCenter: this.#xCenter, 
+                         yCenter: this.#yCenter ,
+                         canvasWidth:  this.#canvas.width,
+                         canvasHeight:  this.#canvas.height,
+                        };
+        
+        this.#worker.postMessage( params );
+        
+        
+    }
+
+}
+
