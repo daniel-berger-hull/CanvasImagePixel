@@ -198,6 +198,7 @@ export const findContour = (imageData) => {
 
 
 
+
 export const setPixelColor = (canvas,dataBuffer,x,y,rgb) => {
 
     const index = XYtoIndex( x ,y, canvas.width, canvas.height);
@@ -205,8 +206,6 @@ export const setPixelColor = (canvas,dataBuffer,x,y,rgb) => {
     dataBuffer[index]   = rgb.red;
     dataBuffer[index+1] = rgb.green
     dataBuffer[index+2] = rgb.blue;
-
-    console.log("Clicked!  [" + x + "," + y + "] --> " + index );
 }  
 
 export const getPixelCode = (canvas,dataBuffer,x,y) => {
@@ -233,6 +232,18 @@ export const getPixelColor = (canvas,dataBuffer,x,y) => {
 
     return rgbToHex(dataBuffer[index],dataBuffer[index+1],dataBuffer[index+2]);
 }  
+// We only draw otho line here (horizontal or vertical)
+export const drawLine = (canvas,dataBuffer,x1,y1, x2,y2, rgb) => {
+
+    if (y1 === y2 ){
+        for (let x = x1; x< x2; x++ )  setPixelColor(canvas,dataBuffer,x,y1,rgb);
+    }
+    else if (x1 === x2 ){
+        for (let y = y1; y< y2; y++ )  setPixelColor(canvas,dataBuffer,x1,y,rgb);
+    }
+    
+
+}
 
 export const stretchBox = (canvas,imageData,x,y) => {
 
@@ -243,13 +254,17 @@ export const stretchBox = (canvas,imageData,x,y) => {
     
 
 
-    setPixelColor(canvas,imageData.data,x,y,color);
+    
 
   
-    //let colorBox = new ColorBox(canvas,imageData,x,y);
+    let colorBox = new ColorBox(canvas,imageData,x,y);
+    const delta = colorBox.process();
+    colorBox.drawBox();
 
 
-    //colorBox.process();
+      console.log("Main Delta ended at " + delta);
+
+    // setPixelColor(canvas,imageData.data,x,y,color);
 //    console.log("[x,y] -> " + x + "," + y + " is " + code);
     // console.log("Stretch Box!");
 
@@ -263,6 +278,8 @@ class ColorBox {
     #xCenter;
     #yCenter;
     #worker;
+    #boxRadius;
+
     
     constructor(canvas,imageData,xCenter,yCenter){
 
@@ -282,28 +299,143 @@ class ColorBox {
     }
 
 
+    // This method only works on orthogonal lines, so either on the same line (y are all the same), or on the same colum (x are all the same)
+    islineSameColor(referenceColor,xStart,yStart, xEnd, yEnd) {
+
+        //Check an horizontal line here..
+        if (yStart === yEnd) {
+
+            //We scan from left to right, permute the x if required 
+            if (xStart > xEnd )  { let tmp = xEnd; xStart = xEnd; xEnd = tmp; }
+            for (let x = xStart; x<=xEnd; x++){
+
+                const nextColorCode = getPixelCode(this.#canvas, this.#imageData.data, x,yStart );
+                if ( nextColorCode !== referenceColor)  return false;
+            }
+        } 
+        // Or check an vertical line...
+        else  if (xStart === xEnd) {
+
+             //And same for the vertical line, we scan from top to bottom, permute the y if required 
+             if (yStart > yEnd )  { let tmp = yEnd; yStart = yEnd; yEnd = tmp; }
+             for (let y = yStart; y<=yEnd;y++){
+ 
+                 const nextColorCode = getPixelCode(this.#canvas, this.#imageData.data, xStart,y );
+                 if ( nextColorCode !== referenceColor)  return false;
+             }
+
+        }
+
+        return true;
+    }
+
+    updateSearchBox(searchBox,delta) {
+
+        //Let deal only with positive delta, as it is easier to undertand... 
+        if (delta <= 0) return;
+
+        searchBox.topLeft.x     =  searchBox.topLeft.x  - delta;
+        searchBox.topLeft.y     =  searchBox.topLeft.y  - delta;
+
+        searchBox.topRight.x    =  searchBox.topRight.x + delta;
+        searchBox.topRight.y    =  searchBox.topRight.y - delta;
+
+        searchBox.bottomRight.x =  searchBox.bottomRight.x + delta;
+        searchBox.bottomRight.y =  searchBox.bottomRight.y + delta;
+
+        searchBox.bottomLeft.x  =  searchBox.bottomLeft.x - delta;
+        searchBox.bottomLeft.y  = searchBox.bottomLeft.y  + delta;
+    }
+
     // Use a web worker to search in the imageData
     process()  {
-        console.log("Will process a search for a color box...");
+       
 
-        // const params = { canvas:  this.#canvas,
+        // Keep this, as it will be used a param later when restoring the Web Workder
+        // const params = {   
         //                  imageData: this.#imageData ,
-        //                  xCenter:  this.#xCenter,
-        //                  yCenter: this.#yCenter };
+        //                  xCenter: this.#xCenter, 
+        //                  yCenter: this.#yCenter ,
+        //                  canvasWidth:  this.#canvas.width,
+        //                  canvasHeight:  this.#canvas.height,
+        //                 };
+        
+        //this.#worker.postMessage( params ); 
 
+        const referenceColorCode = getPixelCode(this.#canvas, this.#imageData.data,
+                                              this.#xCenter, this.#yCenter);
+        const currentColorHex  = getPixelColor(this.#canvas, this.#imageData.data,
+                                              this.#xCenter, this.#yCenter);
+  
 
-        const params = {   
-                         imageData: this.#imageData ,
-                         xCenter: this.#xCenter, 
-                         yCenter: this.#yCenter ,
-                         canvasWidth:  this.#canvas.width,
-                         canvasHeight:  this.#canvas.height,
-                        };
-        
-        this.#worker.postMessage( params );
-        
-        
+        let continueResearch = true;
+
+        let searchBox = {    topLeft  : { x: this.#xCenter, y: this.#yCenter },
+                             topRight  : { x: this.#xCenter, y: this.#yCenter },
+                             bottomLeft  : { x: this.#xCenter, y: this.#yCenter },
+                             bottomRight  : { x: this.#xCenter, y: this.#yCenter }  };
+        let delta = 1;
+
+        while (continueResearch) {
+          
+
+            this.updateSearchBox(searchBox,1);
+
+            if  (  !this.islineSameColor(referenceColorCode, searchBox.topLeft.x, searchBox.topLeft.y, searchBox.topRight.x, searchBox.topRight.y) ||
+                   !this.islineSameColor(referenceColorCode, searchBox.topRight.x, searchBox.topRight.y,searchBox.bottomRight.x, searchBox.bottomRight.y) ||
+                   !this.islineSameColor(referenceColorCode, searchBox.bottomLeft.x, searchBox.bottomLeft.y,searchBox.bottomRight.x, searchBox.bottomRight.y) ||
+                   !this.islineSameColor(referenceColorCode, searchBox.topLeft.x, searchBox.topLeft.y,searchBox.bottomLeft.x, searchBox.bottomLeft.y) )
+            { 
+                continueResearch = false; 
+            }  else { delta++;
+            }                   
+              
+            
+        }
+                     
+        this.#boxRadius = delta;
+        return delta;
     }
+
+    drawBox() {
+
+
+        const delta = this.#boxRadius;
+
+
+        const color = {  red: 255, green: 255, blue: 0};
+        setPixelColor(this.#canvas, 
+                     this.#imageData.data,
+                     this.#xCenter, this.#yCenter,
+                     color);
+
+
+          //Top
+           drawLine(this.#canvas,  this.#imageData.data, 
+                    this.#xCenter-delta, this.#yCenter-delta,
+                    this.#xCenter+delta, this.#yCenter-delta,
+                    color);
+           //Right
+           drawLine(this.#canvas,  this.#imageData.data, 
+                    this.#xCenter+delta, this.#yCenter-delta,
+                    this.#xCenter+delta, this.#yCenter+delta,
+                    color);
+
+            //Bottom
+            drawLine(this.#canvas,  this.#imageData.data, 
+                    this.#xCenter-delta, this.#yCenter+delta,
+                    this.#xCenter+delta, this.#yCenter+delta,
+                    color);
+            
+            //Left
+           drawLine(this.#canvas,  this.#imageData.data, 
+                    this.#xCenter-delta, this.#yCenter-delta,
+                    this.#xCenter-delta, this.#yCenter+delta,
+                    color);
+
+
+    }
+   
 
 }
 

@@ -6,6 +6,7 @@
 // import {  getPixelCode, getPixelColor } from './colorProcessing.js';
 
 
+
 const XYtoIndex = (canvasWidth, canvasHeight,x,y) => {
     return ((canvasWidth * y) + x) * 4;
 }

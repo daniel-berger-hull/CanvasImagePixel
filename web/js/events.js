@@ -17,6 +17,27 @@ const canvasClickHanlder = (e) => {
     
     stretchBox(canvas,imageData,xClick,yClick);
 
+
+    const midWidth  =  Math.round(canvas.width/2);
+    const midHeight  =  Math.round(canvas.height/2);
+    const color = {  red: 255, green: 255, blue: 0};
+
+    for (let i=0;i<25;i++){
+        // const xRandom = Math.round( Math.random()*canvas.width );
+        // const yRandom = Math.round( Math.random()*100 );
+
+        const xRandDel  =   Math.round(  Math.random()*midWidth - midWidth/2);
+        const yRandDel  =  Math.round( Math.random()*midWidth - midWidth/2);
+        
+        const xRandom = midWidth +xRandDel;
+        const yRandom = midHeight +yRandDel;
+        console.log(i + " ["+ xRandom + "," + yRandom + "]");
+
+        setPixelColor(canvas,imageData.data,xRandom,yRandom,color);
+        stretchBox(canvas,imageData,yRandom,yRandom);
+
+    }
+
     // console.log("Clicked!  [" + yClick + "," + yClick + "] --> and color is " + hexColor);
     document.getElementById("color-sample-view").style.backgroundColor = hexColor;
 

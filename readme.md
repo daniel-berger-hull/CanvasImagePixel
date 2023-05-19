@@ -5,6 +5,16 @@
 
 ***************************************************************************************************************************
 
+May 19
+======
+
+  The import does not work in this worker.js file, not sure why...
+  Maybe is is because it is accessed or given as param to a Web Worker?
+
+  To DO:
+     Investigate why import is not working in worker.js
+
+
 May 18
 ======
   Tryied to create a class to delegate the processing of the Inflate box (ColorBox.js), using HTML/JS Web worker.
