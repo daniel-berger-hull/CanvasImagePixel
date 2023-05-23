@@ -248,21 +248,16 @@ export const drawLine = (canvas,dataBuffer,x1,y1, x2,y2, rgb) => {
 export const stretchBox = (canvas,imageData,x,y) => {
 
 
-    const color = {  red: 255, green: 255, blue: 255};
+    //const color = {  red: 255, green: 255, blue: 255};
 
 
-    
-
-
-    
-
-  
     let colorBox = new ColorBox(canvas,imageData,x,y);
     const delta = colorBox.process();
     colorBox.drawBox();
 
+   
 
-      console.log("Main Delta ended at " + delta);
+    //   console.log("Main Delta ended at " + delta);
 
     // setPixelColor(canvas,imageData.data,x,y,color);
 //    console.log("[x,y] -> " + x + "," + y + " is " + code);

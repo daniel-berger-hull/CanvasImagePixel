@@ -30,12 +30,30 @@ self.addEventListener('message', function(e) {
     //                  yCenter: e.yCenter };
 
     const params = e.data;
-    console.log("Web Worker received message: " + e.data );
+
+    // const params = {  canvas:  canvas,
+    //     imageData: imageData,
+    //     x:  xClick,
+    //     y: yClick };
+
+    console.log("Web Worker received message: " );
+    //console.log( `\imageData:  ${params.imageData}`);
+    console.log( `\canvasWidth:  ${params.canvasWidth}`);
+    console.log( `\canvasHeight:  ${params.canvasHeight}`);
+        
+    console.log( `\[x,y]:   [${params.x},${params.y}]`);
+    
     // self.postMessage("Message From Web Worker to the main caller");		
     // self.close();
    
+    //findBox(params);
 
-    findBox(params);
+    const rgb = {red:255, green:0, blue: 0};
+    setPixelColor ( params.canvasWidth,params.canvasHeight,
+                    params.dataBuffer,
+                    params.x,params.y,
+                    rgb);
+                    
 
     postMessage("Message From Web Worker to the main caller");
     close();
