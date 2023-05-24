@@ -1,6 +1,6 @@
-//  import { codeToRGB,rgbToHex,
-//      XYtoIndex,
-//      isDark } from './conversion.js';
+//   import { codeToRGB,rgbToHex,
+//       XYtoIndex,
+//       isDark } from './conversion.js';
 
 
 // import {  getPixelCode, getPixelColor } from './colorProcessing.js';
@@ -88,8 +88,8 @@ self.addEventListener('message', function(e) {
 
     const index = XYtoIndex( params.canvasWidth, 
                              params.canvasHeight,
-                            params.xCenter, 
-                            params.yCenter );
+                            params.x, 
+                            params.y );
 
 
     const color = {  red:  255,  green: 255, blue: 255 };

@@ -5,6 +5,12 @@
 
 ***************************************************************************************************************************
 
+May 23
+======
+
+  Removed the Web Worker from the project, and replaced with a simple Javascript interval handler.
+  Did split the pixel oriented functions from the colorProcessing.js
+
 May 22
 ======
 Fixed some rendering problem as the imageData and imageData.data were not used correctly (which made the  context.putImageData failing and not rendering)

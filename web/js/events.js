@@ -1,29 +1,15 @@
 
-import { alterimage , findContour, setPixelColor, getPixelColor , stretchBox}  from './colorProcessing.js';   
-
-
-
-const WORKER_IDLE      = 0;
-const WORKER_INVOKED   = 1;
-const WORKER_DONE      = 2;
-
+import { getPixelColor }  from './pixelFunctions.js';   
+import { alterimage , findContour, stretchBox}  from './colorProcessing.js'
 
 
 const canvas = document.getElementById("my-canvas");
 const context = canvas.getContext("2d");
 
 
-let workerInfo = {
-    currentState: WORKER_IDLE
-}
-
-let webWorker;
-let animate;
 
 
-
-
-// This handlers find where the click on the canvas happens, and locate the right location in the data of image to draw a black dot...
+// This handlers find where the click on the canvas happens, and set a timer function to process the inflate box
 const canvasClickHanlder = (e) => {
 
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -32,52 +18,21 @@ const canvasClickHanlder = (e) => {
     const yClick = e.clientY - canvas.offsetTop;
     const hexColor = getPixelColor(canvas,imageData.data,xClick,yClick);
     
-     stretchBox(canvas,imageData,xClick,yClick);
 
+     const canvasParam = {width: canvas.width, height: canvas.height};
 
-    // const midWidth  =  Math.round(canvas.width/2);
-    // const midHeight  =  Math.round(canvas.height/2);
-    // const color =  {  red: 255, green: 255, blue: 0};
-    // const color2 = {  red: 0, green: 0, blue: 0};
+     const timerParams = { ctx:   context,
+                           canvas: canvasParam,
+                           imageData, imageData,
+                           x: xClick, y: yClick};
+
+     const myTimeout = setTimeout( timerHandler, 200, timerParams );
     
 
-    // for (let i=0;i<25;i++){
-    //     const xRandDel  =  Math.round(  Math.random()*midWidth - midWidth/2);
-    //     const yRandDel  =  Math.round( Math.random()*midHeight - midHeight/2);
-        
-    //     const xRandom = midWidth + xRandDel;
-    //     const yRandom = midHeight +yRandDel;
-    //     //console.log(i + " ["+ xRandom + "," + yRandom + "]");
 
-    //     //stretchBox(canvas,imageData,xRandom,yRandom);
-    //     setPixelColor(canvas,imageData.data,xRandom,yRandom,color2);
-
-    // }
-
-
-     console.log("Clicked!  [" + yClick + "," + yClick + "] --> and color is " + hexColor);
+    console.log("Clicked!  [" + xClick + "," + yClick + "] --> and color is " + hexColor);
     document.getElementById("color-sample-view").style.backgroundColor = hexColor;
     
-     context.putImageData(imageData, 0, 0);
-
-
-
-
-   const params = {  
-                    // canvas:  canvas,
-                    canvasWidth: canvas.width,
-                    canvasHeight: canvas.height,
-                    dataBuffer: imageData.data,
-                    x:  xClick,
-                    y:  yClick };
-//////////////////////////////////////////////////
-   
-//    webWorker.postMessage( 'Please start the work!' ); 
-    workerInfo.currentState = WORKER_IDLE;
-    console.log("Worker State: " + workerInfo.currentState);
-    webWorker.postMessage( params ); 
-  
-
 }
 
 const  colorChangeButtonClickHandler = () => {
@@ -98,43 +53,55 @@ const  findCountourButtonClickHandler = () => {
         context.putImageData(imageData, 0, 0);
 }
 
+const moveMouseHandler = (e) => {
 
 
-
-const  webWorkerMessageHandler = (e) => {
-
-    //console.log("Event.js received message: " + e.data);
-    console.log(`Event.js received message: [${e.data.x},${e.data.y}`);
-    
-    
-
-        const imageData  = context.getImageData(0, 0, canvas.width, canvas.height);
-        
-        
-        const rgb = {red:255, green:255, blue: 0};
-
-       
-        setPixelColor(canvas,imageData.data,e.data.x,e.data.y,rgb);   /// tHIS ONE WORKS!!!
-
-        const midWidth  =  Math.round(canvas.width/2);
-        const midHeight  =  Math.round(canvas.height/2);
-
-
-        e.data.dots.forEach(nextDot => {
-
-             setPixelColor(canvas,imageData.data,nextDot.x,nextDot.y,rgb);
-            
-        });
-
-
-        context.putImageData(imageData, 0, 0);
-
-        workerInfo.currentState = WORKER_DONE;
-
-        console.log("Worker State: " + workerInfo.currentState);
-
-
+    const xClick = e.clientX - canvas.offsetLeft;
+    const yClick = e.clientY - canvas.offsetTop;
+    document.getElementById("coords").innerHTML = `${xClick},${yClick}`;
 }
+
+ const timerHandler = (params) => {
+
+    console.log("Timer handlers v2: [" + params.x + "," + params.y + "]");
+
+
+    let colorBoxes = [];
+    let boxParams = {...params};
+
+
+    // for (let i=0;i<15;i++) {
+
+    //     const xPos = Math.round( Math.random() *  params.canvas.width );
+    //     const yPos = Math.round( Math.random() *  params.canvas.height );
+
+    //     boxParams.x = xPos;
+    //     boxParams.y = yPos;
+
+
+    //     const boxPos = stretchBox(  boxParams.ctx,
+    //                                 boxParams.canvas,
+    //                                 boxParams.imageData,
+    //                                 boxParams.x ,boxParams.y );
+    //     colorBoxes.push(boxPos);
+    // }
+
+    const boxPos = stretchBox(  boxParams.ctx,
+        boxParams.canvas,
+        boxParams.imageData,
+        boxParams.x ,boxParams.y );
+
+    // console.log(`%c Found Inflating Boxes:`, "color:red");
+    // colorBoxes.forEach( (box,i) => {
+    //     console.log(`${i} -> [${box.topLeft.x},${box.topLeft.y}] * [${box.bottomRight.x},${box.bottomRight.y}]`);
+    // });
+
+    params.ctx.putImageData(params.imageData, 0, 0);
+}
+
+
+
+
 // This method setup all the event handlers required by the HTML page.
 export const registerHandlers = () => {
 
@@ -142,29 +109,20 @@ export const registerHandlers = () => {
     const recolorButton      = document.getElementById('colorChangebutton');
     const findcontourButton  = document.getElementById('findcontourbutton');
 
-
-
-
     canvas.addEventListener("click", canvasClickHanlder );
+    canvas.addEventListener("mousemove", moveMouseHandler );
+
+
+    
     recolorButton.addEventListener('click', colorChangeButtonClickHandler );
     findcontourButton.addEventListener('click', findCountourButtonClickHandler );
     
-
-    //webWorker = new Worker('./js/worker.js');
-    webWorker = new Worker('./js/worker.js', { type: "module" });
-               
-    webWorker.addEventListener('message', webWorkerMessageHandler );
-
-   
-    
-     const img = new Image()
+    const img = new Image()
     img.src = "./usa2.png";
-    //img.src = "./test.png";
-
+    
     img.onload = () => {
         
         context.drawImage(img, 0, 0);
-        // animate = window.setInterval(timerRedrawHandler,500);
     }
 }
 
