@@ -44,7 +44,11 @@ export class ColorBox {
             for (let x = xStart; x<=xEnd; x++){
 
                 const nextColorCode = getPixelCode(this.#canvas, this.#imageData.data, x,yStart );
-                if ( nextColorCode !== referenceColor)  return false;
+                if ( nextColorCode !== referenceColor)  {
+                        console.log("Horizontal line search: y=" + yStart + " break at x = " + x)
+                        return false;
+                }
+                    
             }
 
             return true;
@@ -57,7 +61,11 @@ export class ColorBox {
              for (let y = yStart; y<=yEnd;y++){
 
                  const nextColorCode = getPixelCode(this.#canvas, this.#imageData.data, xStart,y );
-                 if ( nextColorCode !== referenceColor)  return false;
+                 if ( nextColorCode !== referenceColor)  {
+                    console.log("Vertical line search: x=" + xStart + " break at y = " + y)
+                    return false;
+                 }
+                
              }
 
              return true;
@@ -124,9 +132,7 @@ export class ColorBox {
 
     drawBox() {
 
-
         const delta = this.#boxRadius;
-
 
         const color = {  red: 255, green: 255, blue: 0};
         setPixelColor(this.#canvas,
@@ -179,6 +185,11 @@ export class ColorRectangle extends ColorBox {
 
 
     edgesDetected = [];
+
+    topLeft;
+    topRight;
+    bottomLeft;
+    bottomRight;
 
 
 
@@ -287,9 +298,54 @@ export class ColorRectangle extends ColorBox {
 
         }
 
+        this.topLeft      = { x: searchBox.topLeft.x,     y: searchBox.topLeft.y  };
+        this.topRight     = { x: searchBox.topRight.x,    y: searchBox.topRight.y  };
+        this.bottomLeft   = { x: searchBox.bottomLeft.x,  y: searchBox.bottomLeft.y };
+        this.bottomRight  = { x: searchBox.bottomRight.x, y: searchBox.bottomRight.y };
+    
         this.setBoxRadius(delta);
 
         return delta;
+    }
+
+    drawBox() {
+
+        console.log("Rectangle drawBox");
+
+        //const delta = this.#boxRadius;
+
+        const color = {  red: 255, green: 255, blue: 0};
+        setPixelColor(this.getCanvas(),
+                     this.getData(),
+                     this.getX(), this.getY(),
+                     color);
+
+
+          //Top
+           drawLine(this.getCanvas(), this.getData(),
+                    this.topLeft.x, this.topLeft.y,
+                    this.topRight.x, this.topRight.y,
+                    color);
+
+
+           //Right
+           drawLine(this.getCanvas(), this.getData(),
+                    this.topRight.x, this.topRight.y,
+                    this.bottomRight.x,  this.bottomRight.y,
+                    color);
+
+            //Bottom
+            drawLine(this.getCanvas(), this.getData(),
+                    this.bottomLeft.x, this.bottomLeft.y,
+                    this.bottomRight.x,  this.bottomRight.y,
+                    color);
+
+            //Left
+           drawLine(this.getCanvas(), this.getData(),
+                    this.topLeft.x, this.topLeft.y,
+                    this.bottomLeft.x, this.bottomLeft.y,
+                    color);
+
     }
 
 }

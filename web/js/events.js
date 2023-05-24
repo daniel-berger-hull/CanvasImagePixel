@@ -87,14 +87,9 @@ const moveMouseHandler = (e) => {
     // }
 
     const boxPos = stretchBox(  boxParams.ctx,
-        boxParams.canvas,
-        boxParams.imageData,
-        boxParams.x ,boxParams.y );
-
-    // console.log(`%c Found Inflating Boxes:`, "color:red");
-    // colorBoxes.forEach( (box,i) => {
-    //     console.log(`${i} -> [${box.topLeft.x},${box.topLeft.y}] * [${box.bottomRight.x},${box.bottomRight.y}]`);
-    // });
+                                boxParams.canvas,
+                                boxParams.imageData,
+                                boxParams.x ,boxParams.y );
 
     params.ctx.putImageData(params.imageData, 0, 0);
 }

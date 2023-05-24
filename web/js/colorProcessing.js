@@ -198,12 +198,13 @@ export const findContour = (imageData) => {
 
 export const stretchBox = (ctx,canvas,imageData,x,y) => {
 
-    let colorBox = new ColorBox(canvas,imageData,x,y);
+    // let colorBox = new ColorBox(canvas,imageData,x,y);
     let rectangleBox = new ColorRectangle(canvas,imageData,x,y);
 
 
     
     const delta  = colorBox.process();
+    console.log("🚀 ~ file: colorProcessing.js:207 ~ stretchBox ~ delta:", delta)
     const delta2 = rectangleBox.process();
     
     colorBox.drawBox();
@@ -215,6 +216,9 @@ export const stretchBox = (ctx,canvas,imageData,x,y) => {
         console.log(`${edge.direction} step# ${edge.step} `); 
     });
 
+
+    const boxPos = colorBox.getBox();
+    console.log("🚀 ~ file: colorProcessing.js:221 ~ stretchBox ~ boxPos:", boxPos)
 
 
     
