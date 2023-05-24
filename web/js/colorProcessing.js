@@ -256,7 +256,7 @@ export const stretchBox = (canvas,imageData,x,y) => {
     colorBox.drawBox();
 
    
-
+    //context.putImageData(imageData, 0, 0);
     //   console.log("Main Delta ended at " + delta);
 
     // setPixelColor(canvas,imageData.data,x,y,color);

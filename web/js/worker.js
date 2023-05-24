@@ -1,46 +1,49 @@
-// import { codeToRGB,rgbToHex,
-//     XYtoIndex,
-//     isDark } from './conversion.js';
+//  import { codeToRGB,rgbToHex,
+//      XYtoIndex,
+//      isDark } from './conversion.js';
 
 
 // import {  getPixelCode, getPixelColor } from './colorProcessing.js';
 
 
 
-const XYtoIndex = (canvasWidth, canvasHeight,x,y) => {
-    return ((canvasWidth * y) + x) * 4;
+
+const randomDots = (canvasWidth,canvasHeight) => {
+
+    const dots = [];
+
+    const midWidth  =  Math.round(canvasWidth/2);
+    const midHeight =  Math.round(canvasHeight/2);
+
+
+     for (let i=0;i<25;i++){
+        const xRandDel  =  Math.round(  Math.random()*midWidth - midWidth/2);
+        const yRandDel  =  Math.round( Math.random()*midHeight - midHeight/2);
+        
+        const xRandom = midWidth + xRandDel;
+        const yRandom = midHeight +yRandDel;
+        console.log(i + " ["+ xRandom + "," + yRandom + "]");
+
+        //stretchBox(canvas,imageData,xRandom,yRandom);
+        // setPixelColor(canvas,imageData.data,xRandom,yRandom,color2);
+
+        dots.push({x: xRandom, y:yRandom});
+
+    }
+
+    return dots;
 }
-
-const setPixelColor = (canvasWidth,canvasHeight,dataBuffer,x,y,rgb) => {
-
-    const index = XYtoIndex( canvasWidth, canvasHeight, x ,y);
-
-    dataBuffer[index]   = rgb.red;
-    dataBuffer[index+1] = rgb.green
-    dataBuffer[index+2] = rgb.blue;
-
-    console.log("Worked setPixelColor Clicked!  [" + x + "," + y + "] --> " + index );
-}  
+   
 
 self.addEventListener('message', function(e) {
  
-    // const params = { canvas:  e.data.canvas,
-    //                  imageData: e.data.imageData ,
-    //                  xCenter:  e.xCenter,
-    //                  yCenter: e.yCenter };
 
     const params = e.data;
 
-    // const params = {  canvas:  canvas,
-    //     imageData: imageData,
-    //     x:  xClick,
-    //     y: yClick };
 
     console.log("Web Worker received message: " );
-    //console.log( `\imageData:  ${params.imageData}`);
     console.log( `\canvasWidth:  ${params.canvasWidth}`);
-    console.log( `\canvasHeight:  ${params.canvasHeight}`);
-        
+    console.log( `\canvasHeight:  ${params.canvasHeight}`);        
     console.log( `\[x,y]:   [${params.x},${params.y}]`);
     
     // self.postMessage("Message From Web Worker to the main caller");		
@@ -48,17 +51,33 @@ self.addEventListener('message', function(e) {
    
     //findBox(params);
 
-    const rgb = {red:255, green:0, blue: 0};
-    setPixelColor ( params.canvasWidth,params.canvasHeight,
-                    params.dataBuffer,
-                    params.x,params.y,
-                    rgb);
+    // const rgb = {red:255, green:255, blue: 255};
+    // setPixelColor ( params.canvasWidth,params.canvasHeight,
+    //                 params.dataBuffer,
+    //                 params.x,params.y,
+    //                 rgb);
                     
 
-    postMessage("Message From Web Worker to the main caller");
-    close();
+
+                    const results = {                         
+                        x:  params.x,
+                        y:  params.y ,
+                        dots:  randomDots(params.canvasWidth,params.canvasHeight)
+                    
+                    };
+
+
+//    postMessage("Message From Web Worker to the main caller");
+    postMessage(results);
+
+    
+
+
+
+    // close();
  });
 
+ 
 
 
 

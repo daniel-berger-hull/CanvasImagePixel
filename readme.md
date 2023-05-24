@@ -5,6 +5,15 @@
 
 ***************************************************************************************************************************
 
+May 22
+======
+Fixed some rendering problem as the imageData and imageData.data were not used correctly (which made the  context.putImageData failing and not rendering)
+Also, the web worker is now instanciated as module, which makes possible to use imports...
+
+To DO:
+  Ready now to retry a thread (Web Worker) that is using a ColorBox (and not a ColorBox that is using internally a thread)
+  Make sure to respect this Thread-Using-Colorbox design!
+
 May 19
 ======
 
