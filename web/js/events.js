@@ -1,3 +1,7 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// This files contains
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 import { getPixelColor }  from './pixelFunctions.js';   
 import { alterimage , findContour, stretchBox}  from './colorProcessing.js'
@@ -65,26 +69,7 @@ const moveMouseHandler = (e) => {
 
     console.log("Timer handlers v2: [" + params.x + "," + params.y + "]");
 
-
-    let colorBoxes = [];
     let boxParams = {...params};
-
-
-    // for (let i=0;i<15;i++) {
-
-    //     const xPos = Math.round( Math.random() *  params.canvas.width );
-    //     const yPos = Math.round( Math.random() *  params.canvas.height );
-
-    //     boxParams.x = xPos;
-    //     boxParams.y = yPos;
-
-
-    //     const boxPos = stretchBox(  boxParams.ctx,
-    //                                 boxParams.canvas,
-    //                                 boxParams.imageData,
-    //                                 boxParams.x ,boxParams.y );
-    //     colorBoxes.push(boxPos);
-    // }
 
     const boxPos = stretchBox(  boxParams.ctx,
                                 boxParams.canvas,
@@ -113,7 +98,7 @@ export const registerHandlers = () => {
     findcontourButton.addEventListener('click', findCountourButtonClickHandler );
     
     const img = new Image()
-    img.src = "./usa2.png";
+    img.src = "./usa.png";
     
     img.onload = () => {
         

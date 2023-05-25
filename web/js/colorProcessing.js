@@ -6,13 +6,11 @@ const RED    =      255;
 const GREEN  =    65280;
 const BLUE   = 16711680;
 
- import { codeToRGB,rgbToHex,
-          XYtoIndex,
-          isDark } from './conversion.js';
+ import { codeToRGB,rgbToHex, isDark } from './conversion.js';
 
-import {setPixelColor, 
-        getPixelCode,getPixelColor,
-        drawLine }  from './pixelFunctions.js';
+// import {setPixelColor, 
+//         getPixelCode,getPixelColor,
+//         drawLine }  from './pixelFunctions.js';
 
 import { ColorBox , ColorRectangle } from './ColorBox.js';
 
@@ -198,7 +196,6 @@ export const findContour = (imageData) => {
 
 export const stretchBox = (ctx,canvas,imageData,x,y) => {
 
-    // let colorBox = new ColorBox(canvas,imageData,x,y);
     let rectangleBox = new ColorRectangle(canvas,imageData,x,y);
 
 
@@ -215,9 +212,6 @@ export const stretchBox = (ctx,canvas,imageData,x,y) => {
 
 
     
-
-    
-
     return rectangleBox.getBox();
 
 }
