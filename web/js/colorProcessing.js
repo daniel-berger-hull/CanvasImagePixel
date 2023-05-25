@@ -203,11 +203,8 @@ export const stretchBox = (ctx,canvas,imageData,x,y) => {
 
 
     
-    const delta  = colorBox.process();
-    console.log("🚀 ~ file: colorProcessing.js:207 ~ stretchBox ~ delta:", delta)
     const delta2 = rectangleBox.process();
     
-    colorBox.drawBox();
     rectangleBox.drawBox();
 
 
@@ -217,13 +214,11 @@ export const stretchBox = (ctx,canvas,imageData,x,y) => {
     });
 
 
-    const boxPos = colorBox.getBox();
-    console.log("🚀 ~ file: colorProcessing.js:221 ~ stretchBox ~ boxPos:", boxPos)
-
+    
 
     
 
-    return colorBox.getBox();
+    return rectangleBox.getBox();
 
 }
 
